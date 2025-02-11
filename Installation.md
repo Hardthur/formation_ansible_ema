@@ -1,5 +1,10 @@
-vagrant up ubuntu
-vagrant ssh ubuntu
+#Labo Installation
+
+##Exercice 1
+
+Activation & connexion à la vm ubuntu.
+```vagrant up ubuntu && vagrant ssh ubuntu```
+
 apt-update
 apt-cache search --names-only "ansible"
 apt install ansible
