@@ -15,8 +15,9 @@ nano /etc/hosts
 ```
 
 Création d'une paire de clés RSA  
-
 `ssh-keygen`  
+
+  
 Envoi de notre clé publique sur les trois target hosts.  
 `ssh-copy-id target01 && ssh-copy-id target02 && ssh-copy-id target03`  
 
