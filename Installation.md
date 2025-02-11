@@ -1,15 +1,17 @@
-#Labo Installation
+# Labo Installation
 
-##Exercice 1
+## Exercice 1
 
 Activation & connexion à la vm ubuntu.
 ```vagrant up ubuntu && vagrant ssh ubuntu```
-
-apt-update
-apt-cache search --names-only "ansible"
-apt install ansible
-vérifier si l'installation s'est bien déroulée ? apt show ?
-version d'ansible visible avec apt show
+Rafraichissement des paquets
+```apt-update```
+Recherche du paquet ansible
+```apt-cache search --names-only "ansible"```
+Installation d'Ansible
+```apt install ansible```
+Vérification version d'ansible
+```ansible --version```
 
 ==
 apt show ansible -a 
