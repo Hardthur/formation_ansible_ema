@@ -1,0 +1,13 @@
+
+vagrant up && vagrant ssh control
+
+nano /etc/hosts
+192.168.56.10 control
+192.168.56.20 target01
+192.168.56.30 target02
+192.168.56.40 target03
+
+ssh-keygen
+ssh-copy-id target01 && ssh-copy-id target02 && ssh-copy-id target03
+
+ansible all -i target01,target02,target03 -m ping
