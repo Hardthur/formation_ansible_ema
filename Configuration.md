@@ -2,25 +2,23 @@
 
 ## Exercice
 
-Nous allons commencer par démarrer l'ensemble des machines virtuelles présentes dans le répertoire `atelier-06`.
+Démarrage des VM présentes dans le répertoire `atelier-06`.
 
 ```sh
 vagrant up
 ```
 
-Connectons-nous maintenant au contrôleur.
+On se connecte au contrôleur.
 
 ```sh
 vagrant ssh control
 ```
 
-Nous allons ensuite modifier le fichier `/etc/hosts` en associant les adresses IP des machines cibles à leurs noms d'hôtes.
+On rajoute des entrées DNS locales pour nos target host.
 
 ```sh
 sudo nano /etc/hosts
 ```
-
-> Ajoutez les lignes suivantes au fichier :
 
 ```sh
 192.168.56.10  control.sandbox.lan     control
@@ -29,25 +27,23 @@ sudo nano /etc/hosts
 192.168.56.40  target03.sandbox.lan    target03
 ```
 
-Collectons les clés SSH publiques des hôtes cibles.
+On récupère les clés publiques des TH
 
 ```sh
 ssh-keyscan -t rsa target01 target02 target03 >> .ssh/known_hosts
 ```
 
-Générons maintenant une clé SSH sur le contrôleur.
+Et nous générons notre paire de clé RSA.
 
 ```sh
 ssh-keygen
 ```
 
 Enfin, distribuons notre clé publique aux différents hôtes cibles.
-Le mot de passe par défaut des machines virtuelles est `vagrant`.
 
 ```sh
-ssh-copy-id vagrant@target01
-ssh-copy-id vagrant@target02
-ssh-copy-id vagrant@target03
+ssh-copy-id target01 && ssh-copy-id target02 && ssh-copy-id target03
+
 ```
 
 Installons Ansible en utilisant les dépôts d'Ubuntu.
@@ -66,31 +62,42 @@ ansible all -i target01,target02,target03 -u vagrant -m ping
 > Exemple de sortie de la commande :
 
 ```sh
-target02 | SUCCESS => {"ping": "pong"}
-target03 | SUCCESS => {"ping": "pong"}
-target01 | SUCCESS => {"ping": "pong"}
+vagrant@control:~$ ansible all -i target01,target02,target03 -u vagrant -m ping
+target02 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+target03 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+target01 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
+}
 ```
 
-Créons un répertoire de travail pour notre projet Ansible.
+Créons un répertoire de travail pour notre projet Ansible ainsi qu'un fichier de configuration
 
 ```sh
-mkdir ~/monprojet
+mkdir ~/monprojet && touch ~/monprojet/ansible.cfg && cd monprojet
 ```
 
-Puis créons un fichier `ansible.cfg` dans ce répertoire.
-
-```sh
-touch ~/monprojet/ansible.cfg
-```
-
-Vérifions que le fichier est bien pris en compte par Ansible.
+Vérifions que le fichier de configuration est bien pris en compte par Ansible.
 
 ```sh
 cd ~/monprojet/
 ansible --version | head -n 2
 ```
-
-> Exemple de sortie :
 
 ```sh
 ansible 2.10.8
@@ -102,8 +109,6 @@ Modifions le fichier `ansible.cfg` pour y intégrer un fichier d'inventaire.
 ```sh
 nano ansible.cfg
 ```
-
-> Ajoutez les lignes suivantes au fichier :
 
 ```sh
 [defaults]
@@ -118,15 +123,38 @@ ansible all -i target01,target02,target03 -u vagrant -m ping
 cat ~/journal/ansible.log
 ```
 
+Après avoir lancé une nouvelle fois le module ping d'ansible, on obtient précisément le stdout dans les logs.
+
+```sh
+vagrant@control:~/monprojet$ cat ~/journal/ansible.log 
+2025-02-18 11:42:25,286 p=4640 u=vagrant n=ansible | target01 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+2025-02-18 11:42:25,292 p=4640 u=vagrant n=ansible | target03 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+2025-02-18 11:42:25,295 p=4640 u=vagrant n=ansible | target02 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+```
+
 Créons notre fichier d'inventaire et ajoutons un groupe `[testlab]` comprenant nos trois machines cibles.
 
 ```sh
 nano hosts
-```
 
-> Ajoutez les lignes suivantes au fichier :
-
-```sh
 [testlab]
 target01
 target02
@@ -140,26 +168,34 @@ ansible_become=yes
 Testons notre configuration.
 
 ```sh
-ansible all -m ping
-```
-
-> Exemple de sortie :
-
-```sh
-target02 | SUCCESS => {"ping": "pong"}
-target01 | SUCCESS => {"ping": "pong"}
-target03 | SUCCESS => {"ping": "pong"}
+vagrant@control:~/monprojet$ ansible  all -m ping
+target02 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+target01 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+target03 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
+}
 ```
 
 Affichons la première ligne du fichier `/etc/shadow` de tous les hôtes cibles.
 
 ```sh
 ansible all -a "head -n 1 /etc/shadow"
-```
-
-> Exemple de sortie :
-
-```sh
 target02 | CHANGED | rc=0 >>
 root:*:19769:0:99999:7:::
 target01 | CHANGED | rc=0 >>
