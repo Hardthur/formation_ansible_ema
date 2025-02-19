@@ -18,9 +18,8 @@ rocky | CHANGED => {
     ]
 }
 ```
-
-En exécutant à nouveau la commande, nous obtenons la réponse suivante : `"changed": false`.
-Il s'agit d'un comportement normal puisque les paquets ont déjà été installés.
+Durant cet exercice, la réponse sera toujours la même :
+Nous avons la réponse "changed:false" car la commande est idempotente. Les paquets ont été installés donc rien n'a changé, on a pas d'erreur. 
 
 ```sh
 ansible all -m package -a "name=tree,git,nmap"
@@ -52,7 +51,7 @@ suse | CHANGED => {
 }
 ```
 
-En exécutant à nouveau la commande, nous obtenons la réponse suivante : `"changed": false`.
+Nouvelle exécution :  `"changed": false`.
 
 ```sh
 ansible all -m package -a "name=tree,git,nmap state=absent"
@@ -74,7 +73,7 @@ suse | SUCCESS => {
 
 ## Copie de fichier
 
-Copions le fichier `/etc/fstab` du contrôleur vers le fichier `/tmp/test3.txt` de toutes les machines cibles.
+Copions le fichier `/etc/fstab` du contrôleur vers le fichier `/tmp/test3.txt` de toutes les TH.
 
 ```sh
 ansible all -m copy -a "src=/etc/fstab dest=/tmp/test3.txt"
@@ -117,7 +116,7 @@ suse | CHANGED => {
 }
 ```
 
-En exécutant à nouveau la commande, nous obtenons la réponse suivante : `"changed": false`.
+Nouvelle exécution : `"changed": false`.
 
 ## Affichage de l'espace disque
 
