@@ -37,11 +37,7 @@ Création d'un répertoire templates avec le fichier chrony.conf.j2
 ```sh
 mkdir templates
 nano templates/chrony.conf.j2
-```
 
-> Retrouvez ci-dessous le contenu du fichier :
-
-```sh
 # {{chrony_conf_path}}
 server 0.fr.pool.ntp.org iburst
 server 1.fr.pool.ntp.org iburst
